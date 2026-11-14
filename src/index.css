@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #FFFFFF;
+    color: #0A0A0A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom subtle scrollbars */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F9F9F9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #E5E5E5;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #D4D4D4;
+  }
+}
+
+@layer components {
+  /* Minimalist Luxury Button Styles */
+  .btn-primary {
+    @apply bg-ink text-white font-sans text-xs uppercase tracking-widest px-4 py-2.5 transition-all duration-150 border border-ink hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+    border-radius: 4px;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-ink font-sans text-xs uppercase tracking-widest px-4 py-2.5 transition-all duration-150 border border-border hover:bg-alabaster disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+    border-radius: 4px;
+  }
+
+  .btn-danger {
+    @apply bg-crimson text-white font-sans text-xs uppercase tracking-widest px-4 py-2.5 transition-all duration-150 border border-crimson hover:bg-red-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+    border-radius: 4px;
+  }
+
+  /* Form Inputs with High-End Minimalist Focus */
+  .input-minimal {
+    @apply w-full bg-white border border-border px-3.5 py-2.5 text-sm font-sans text-ink placeholder:text-neutral-400 focus:outline-none focus:border-ink transition-colors;
+    border-radius: 4px;
+  }
+
+  /* Surface Cards */
+  .card-surface {
+    @apply bg-white border border-border transition-all;
+    border-radius: 4px;
+  }
+}
+
+/* Print Optimization */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    font-size: 11pt;
+  }
+}
+
