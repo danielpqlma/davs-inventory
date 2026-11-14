@@ -263,7 +263,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
           }
         }
 
-        showToast?.('Prenda actualizada correctamente en Supabase', 'success');
+        showToast?.('Prenda actualizada correctamente', 'success');
       } else {
         // Crear nuevo producto en 'products'
         const { data: newProd, error: createErr } = await supabase
@@ -312,14 +312,14 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
           }
         }
 
-        showToast?.('Nueva prenda y stock registrados en Supabase', 'success');
+        showToast?.('Prenda registrada en el inventario', 'success');
       }
 
       onSaved?.();
       onClose();
     } catch (err) {
-      console.error('Error al guardar en Supabase:', err);
-      setError(err.message || 'Error al guardar la información en Supabase.');
+      console.error('Error al guardar:', err);
+      setError(err.message || 'Error al guardar la información.');
     } finally {
       setSaving(false);
       setUploadingImage(false);
@@ -464,7 +464,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
           {/* Section 2: Photo / Image */}
           <div className="space-y-3">
             <h3 className="font-sans text-[10px] uppercase tracking-widest text-neutral-400 font-bold border-b border-border pb-1">
-              2. Fotografía de la Prenda (Supabase Storage)
+              Fotografía
             </h3>
 
             <div className="flex flex-col sm:flex-row gap-4 items-start">
@@ -476,6 +476,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                       src={imagePreview}
                       alt="Vista previa"
                       className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
                     />
                     <button
                       type="button"
@@ -497,22 +498,10 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
 
               {/* Upload controls */}
               <div className="flex-1 space-y-2 w-full">
-                <div className="flex items-center gap-2">
-                  <label className="btn-secondary !py-2 cursor-pointer flex-1 justify-center">
-                    <Upload className="w-3.5 h-3.5 text-neutral-500" />
-                    <span>Subir archivo a Storage</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
                 <div className="relative">
                   <input
                     type="url"
-                    placeholder="O pegar URL de imagen externa..."
+                    placeholder="Pega el enlace de la imagen (SHEIN, catálogo, etc.)..."
                     value={imageUrl}
                     onChange={(e) => {
                       setImageUrl(e.target.value);
@@ -522,9 +511,19 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                     className="input-minimal text-xs"
                   />
                 </div>
-                <p className="font-sans text-[10px] text-neutral-400">
-                  Las fotos se alojan en el bucket <code className="bg-alabaster px-1 py-0.5 border rounded">product-images</code> de Supabase.
-                </p>
+
+                <div className="flex items-center gap-2">
+                  <label className="btn-secondary !py-2 cursor-pointer flex-1 justify-center">
+                    <Upload className="w-3.5 h-3.5 text-neutral-500" />
+                    <span>O subir foto desde tu dispositivo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -533,7 +532,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-border pb-1">
               <h3 className="font-sans text-[10px] uppercase tracking-widest text-neutral-400 font-bold">
-                3. Matriz de Variantes (Talla + Color + Stock Físico)
+                Variantes
               </h3>
               <span className="font-sans text-[11px] text-neutral-500">
                 Total:{' '}
@@ -652,37 +651,13 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                   </button>
                 </div>
               </div>
-
-              {/* Luxury Preset Chips */}
-              <div className="pt-1 flex flex-wrap gap-1.5 items-center">
-                <span className="text-[10px] font-sans text-neutral-400">Presets Dav's:</span>
-                {LUXURY_PALETTE_COLORS.slice(0, 6).map((c) => (
-                  <button
-                    key={c.name}
-                    type="button"
-                    onClick={() => {
-                      setVarColorName(c.name);
-                      setVarColorHex(c.hex);
-                    }}
-                    className="inline-flex items-center gap-1 text-[10px] font-sans px-2 py-0.5 bg-white border border-border rounded hover:border-ink transition-colors"
-                  >
-                    <span
-                      className="w-2 h-2 rounded-full inline-block"
-                      style={{ backgroundColor: c.hex, border: '1px solid rgba(0,0,0,0.1)' }}
-                    />
-                    <span>{c.name}</span>
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         </form>
 
         {/* Modal Footer */}
         <div className="px-6 py-4 border-t border-border bg-alabaster/40 flex items-center justify-between flex-shrink-0">
-          <p className="font-sans text-[11px] text-neutral-400">
-            {isEditing ? 'Los cambios se reflejarán de inmediato en Supabase.' : 'Guarda para registrar en PostgreSQL.'}
-          </p>
+          <span />
           <div className="flex gap-2">
             <button
               type="button"
@@ -700,7 +675,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
             >
               {saving ? (
                 <span className="inline-block animate-pulse">
-                  {uploadingImage ? 'Subiendo imagen...' : 'Guardando en Supabase...'}
+                  {uploadingImage ? 'Subiendo imagen...' : 'Guardando...'}
                 </span>
               ) : (
                 <span>{isEditing ? 'Guardar Cambios' : 'Registrar Prenda'}</span>

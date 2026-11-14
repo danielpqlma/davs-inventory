@@ -64,25 +64,12 @@ export function Sidebar({
           Control de Inventario
         </p>
 
-        {/* Database Status Indicator */}
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                configured ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'
-              }`}
-            />
-            <span className="font-sans text-[11px] text-neutral-500">
-              {configured ? 'PostgreSQL En Vivo' : 'Supabase Inactivo'}
-            </span>
-          </div>
-          <button
-            onClick={() => setShowConfig(true)}
-            title="Ajustar conexión Supabase"
-            className="text-neutral-400 hover:text-ink transition-colors p-1"
-          >
-            <Database className="w-3.5 h-3.5" />
-          </button>
+        {/* Status Indicator */}
+        <div className="mt-3 flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="font-sans text-[11px] text-neutral-500">
+            En línea
+          </span>
         </div>
       </div>
 
@@ -172,11 +159,6 @@ export function Sidebar({
           </button>
         </div>
       </div>
-
-      <SupabaseConfigModal
-        isOpen={showConfig}
-        onClose={() => setShowConfig(false)}
-      />
     </aside>
   );
 }

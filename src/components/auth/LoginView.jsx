@@ -58,17 +58,6 @@ export function LoginView() {
             Atelier & Retail
           </span>
         </div>
-
-        <button
-          onClick={() => setShowConfig(true)}
-          className="btn-secondary !py-1.5 !px-3 text-[11px] flex items-center gap-1.5"
-          title="Configurar conexión Supabase"
-        >
-          <Settings className="w-3.5 h-3.5 text-neutral-500" />
-          <span className="hidden sm:inline">
-            {configured ? 'Supabase Conectado' : 'Configurar Supabase'}
-          </span>
-        </button>
       </header>
 
       {/* Centered Editorial Form */}
@@ -88,26 +77,6 @@ export function LoginView() {
             Control de Inventario y Movimientos
           </p>
         </div>
-
-        {!configured && (
-          <div className="mb-6 p-4 bg-[#FAF6EE] border border-[#EFE7D8] rounded text-left space-y-2">
-            <div className="flex items-center gap-2 text-[#B89B72]">
-              <Settings className="w-4 h-4 flex-shrink-0" />
-              <p className="font-sans text-xs font-medium">
-                Conexión Supabase Pendiente
-              </p>
-            </div>
-            <p className="font-sans text-[11px] text-neutral-600 leading-relaxed">
-              Configura tu URL y Anon Key para habilitar la autenticación real de PostgreSQL.
-            </p>
-            <button
-              onClick={() => setShowConfig(true)}
-              className="text-[11px] font-sans font-medium text-ink underline uppercase tracking-wider block"
-            >
-              Configurar ahora →
-            </button>
-          </div>
-        )}
 
         {error && (
           <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded flex items-start gap-2.5 text-left">
@@ -207,12 +176,6 @@ export function LoginView() {
       <footer className="text-center font-sans text-[11px] text-neutral-400">
         <p>Dav's Atelier Retail System © {new Date().getFullYear()} — Uso exclusivo del personal autorizado.</p>
       </footer>
-
-      {/* Supabase Config Modal */}
-      <SupabaseConfigModal
-        isOpen={showConfig}
-        onClose={() => setShowConfig(false)}
-      />
     </div>
   );
 }

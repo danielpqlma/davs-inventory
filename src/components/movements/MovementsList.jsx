@@ -68,7 +68,7 @@ export function MovementsList({ showToast }) {
             Historial de Movimientos
           </h2>
           <p className="font-sans text-xs text-neutral-400 uppercase tracking-widest mt-0.5">
-            Registro de auditoría en tiempo real (tabla inventory_logs)
+            Registro de movimientos y ventas en tiempo real
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export function MovementsList({ showToast }) {
         {loading ? (
           <div className="py-16 text-center text-xs font-sans text-neutral-400 flex flex-col items-center justify-center gap-2">
             <RefreshCw className="w-5 h-5 animate-spin text-ink" />
-            <span>Consultando historial en Supabase...</span>
+            <span>Cargando historial...</span>
           </div>
         ) : filteredLogs.length === 0 ? (
           <div className="py-16 text-center text-xs font-sans text-neutral-400">

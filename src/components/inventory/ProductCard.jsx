@@ -33,6 +33,7 @@ export function ProductCard({
               alt={product.name}
               className="w-full h-full object-cover"
               loading="lazy"
+              referrerPolicy="no-referrer"
             />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-alabaster">

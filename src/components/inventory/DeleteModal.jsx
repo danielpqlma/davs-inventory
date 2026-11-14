@@ -56,7 +56,7 @@ export function DeleteModal({ isOpen, onClose, product, onDeleted, showToast }) 
         {/* Content */}
         <div className="p-6 space-y-4">
           <p className="font-sans text-xs text-neutral-600 leading-relaxed">
-            ¿Estás seguro de que deseas eliminar permanentemente esta prenda de la base de datos de Dav's?
+            ¿Estás seguro de que deseas eliminar permanentemente esta prenda del inventario de Dav's?
           </p>
 
           <div className="p-3 bg-alabaster border border-border rounded space-y-1">
@@ -70,7 +70,7 @@ export function DeleteModal({ isOpen, onClose, product, onDeleted, showToast }) 
           </div>
 
           <p className="font-sans text-[11px] text-neutral-400">
-            Esta acción ejecutará una eliminación en cascada (CASCADE) en PostgreSQL y no se puede deshacer.
+            Esta acción no se puede deshacer.
           </p>
 
           {error && (

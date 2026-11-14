@@ -98,8 +98,8 @@ export function App() {
       if (error) throw error;
       setProducts(data || []);
     } catch (err) {
-      console.error('Error al cargar inventario de Supabase:', err);
-      showToast('Error al conectar con la base de datos de Supabase', 'error');
+      console.error('Error al cargar inventario:', err);
+      showToast('Error al conectar con el servidor', 'error');
     } finally {
       setLoadingProducts(false);
       setIsRefreshing(false);
@@ -155,8 +155,8 @@ export function App() {
         'success'
       );
     } catch (err) {
-      console.error('Error ajustando stock en Supabase:', err);
-      showToast('Error al sincronizar el stock con Supabase', 'error');
+      console.error('Error ajustando stock:', err);
+      showToast('Error al sincronizar el stock', 'error');
       // Rollback on error
       fetchProducts(true);
     } finally {
@@ -269,7 +269,7 @@ export function App() {
                     Resumen Ejecutivo
                   </h1>
                   <p className="font-sans text-xs text-neutral-400 uppercase tracking-widest mt-1">
-                    Métricas del inventario en tiempo real sincronizado con Supabase
+                    Métricas del inventario en tiempo real
                   </p>
                 </div>
 
@@ -337,10 +337,10 @@ export function App() {
                     onClick={() => fetchProducts(true)}
                     disabled={isRefreshing}
                     className="btn-secondary !py-2 text-xs hidden sm:flex"
-                    title="Recargar desde Supabase"
+                    title="Actualizar catálogo"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    <span>Sincronizar</span>
+                    <span>Actualizar</span>
                   </button>
 
                   <button onClick={handleNewProduct} className="btn-primary !py-2 text-xs">
@@ -423,10 +423,7 @@ export function App() {
                 <div className="card-surface py-20 text-center flex flex-col items-center justify-center gap-3">
                   <RefreshCw className="w-6 h-6 animate-spin text-ink" />
                   <p className="font-serif text-lg text-ink font-light">
-                    Consultando inventario en Supabase...
-                  </p>
-                  <p className="font-sans text-xs text-neutral-400">
-                    Leyendo tablas products y product_variants
+                    Cargando inventario...
                   </p>
                 </div>
               ) : (

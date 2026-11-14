@@ -127,6 +127,7 @@ export function ProductTable({
                               alt={p.name}
                               className="w-full h-full object-cover"
                               loading="lazy"
+                              referrerPolicy="no-referrer"
                             />
                           ) : (
                             <span className="font-serif text-sm text-neutral-400 italic">
@@ -236,10 +237,10 @@ export function ProductTable({
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="font-sans text-[10px] uppercase tracking-widest text-neutral-500 font-semibold">
-                                Matriz Talla / Color — Ajuste Directo en Supabase
+                                Ajuste de Stock por Variante
                               </span>
                               <span className="font-sans text-[11px] text-neutral-400">
-                                Los cambios con + y - se sincronizan y registran en el historial de forma instantánea.
+                                Los ajustes con + y - actualizan el stock físico de forma inmediata.
                               </span>
                             </div>
 
