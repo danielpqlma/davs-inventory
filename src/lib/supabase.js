@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const envUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const envUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fccyggmwheeucsjkzlrt.supabase.co';
+const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_1oTrc_SEupsgh5-QTuaZlQ_48N1E0-u';
 
 // Fallback to localStorage override if user enters them via UI prompt
 const localUrl = typeof window !== 'undefined' ? localStorage.getItem('davs_supabase_url') || '' : '';
