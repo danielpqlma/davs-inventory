@@ -35,12 +35,13 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
 
   // New variant helper inputs
   const [varSize, setVarSize] = useState('S');
-  const [varColorName, setVarColorName] = useState('Negro Noche');
+  const [varColorName, setVarColorName] = useState('');
   const [varColorHex, setVarColorHex] = useState('#1A1A1A');
-  const [varStock, setVarStock] = useState('3');
+  const [varStock, setVarStock] = useState('1');
 
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
   const [error, setError] = useState(null);
 
   // Load existing product or reset
@@ -54,6 +55,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
       setImageUrl(productToEdit.image_url || '');
       setImagePreview(productToEdit.image_url || '');
       setImageFile(null);
+      setImageLoadError(false);
       setVariants(
         (productToEdit.product_variants || []).map((v) => ({
           id: v.id,
@@ -74,11 +76,8 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
       setImageUrl('');
       setImagePreview('');
       setImageFile(null);
-      // Default initial variant set for quick setup
-      setVariants([
-        { id: `temp-${Date.now()}-1`, size: 'S', color: 'Negro Noche', color_hex: '#1A1A1A', stock: 2 },
-        { id: `temp-${Date.now()}-2`, size: 'M', color: 'Negro Noche', color_hex: '#1A1A1A', stock: 3 },
-      ]);
+      setImageLoadError(false);
+      setVariants([]);
     }
     setError(null);
   }, [productToEdit, isOpen]);
@@ -477,6 +476,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                       alt="Vista previa"
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
+                      onError={() => setImageLoadError(true)}
                     />
                     <button
                       type="button"
@@ -484,6 +484,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                         setImageFile(null);
                         setImagePreview('');
                         setImageUrl('');
+                        setImageLoadError(false);
                       }}
                       className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black transition-colors"
                       title="Eliminar foto"
@@ -500,17 +501,25 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
               <div className="flex-1 space-y-2 w-full">
                 <div className="relative">
                   <input
-                    type="url"
-                    placeholder="Pega el enlace de la imagen (SHEIN, catálogo, etc.)..."
+                    type="text"
                     value={imageUrl}
                     onChange={(e) => {
-                      setImageUrl(e.target.value);
-                      setImagePreview(e.target.value);
+                      let val = e.target.value.trim().replace(/^["']|["']$/g, '');
+                      if (val.startsWith('//')) val = 'https:' + val;
+                      setImageUrl(val);
+                      setImagePreview(val);
                       setImageFile(null);
+                      setImageLoadError(false);
                     }}
                     className="input-minimal text-xs"
                   />
                 </div>
+
+                {imageLoadError && imagePreview && (
+                  <p className="font-sans text-[11px] text-amber-700 bg-amber-50 p-2 border border-amber-200 rounded leading-tight">
+                    No se pudo cargar la imagen. En SHEIN, haz <strong>clic derecho sobre la foto</strong> y elige <strong>"Copiar dirección de la imagen"</strong> (no el enlace de la página).
+                  </p>
+                )}
 
                 <div className="flex items-center gap-2">
                   <label className="btn-secondary !py-2 cursor-pointer flex-1 justify-center">
