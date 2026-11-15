@@ -23,12 +23,12 @@ export function DeleteModal({ isOpen, onClose, product, onDeleted, showToast }) 
 
       if (delErr) throw delErr;
 
-      showToast?.(`Prenda ${product.name} eliminada de Supabase`, 'info');
+      showToast?.(`Prenda ${product.name} eliminada`, 'info');
       onDeleted?.(product.id);
       onClose();
     } catch (err) {
-      console.error('Error al eliminar producto de Supabase:', err);
-      setError(err.message || 'Error al eliminar el producto de la base de datos.');
+      console.error('Error al eliminar producto:', err);
+      setError(err.message || 'Error al eliminar el producto.');
     } finally {
       setDeleting(false);
     }

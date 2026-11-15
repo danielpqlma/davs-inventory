@@ -57,7 +57,7 @@ export function Sidebar({
             Dav's
           </span>
           <span className="font-sans text-[10px] uppercase tracking-widest text-[#B89B72] font-semibold">
-            Boutique
+            Tienda
           </span>
         </div>
         <p className="font-sans text-[10px] uppercase tracking-widest text-neutral-400 mt-1">

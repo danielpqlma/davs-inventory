@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import {
   CATEGORIES,
   STANDARD_SIZES,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 
 export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToast }) {
+  const { user } = useAuth();
   const isEditing = !!productToEdit;
 
   // Form State
@@ -274,6 +276,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
             cost_price: costNum,
             sale_price: saleNum,
             image_url: finalImageUrl || null,
+            user_id: user?.id,
           })
           .select()
           .single();
