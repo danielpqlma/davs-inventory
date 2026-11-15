@@ -5,7 +5,7 @@ import {
   STANDARD_SIZES,
   LUXURY_PALETTE_COLORS,
   generateSKU,
-  calculateMargin
+  formatMoney
 } from '../../lib/utils';
 import { uploadProductImage, supabase } from '../../lib/supabase';
 import { ColorIndicator } from '../ui/Badge';
@@ -123,16 +123,23 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
       return;
     }
 
+    // Buscar color coincidente en la paleta o asignar tono estándar
+    const matchedColor = LUXURY_PALETTE_COLORS.find(
+      (c) => c.name.toLowerCase() === varColorName.trim().toLowerCase()
+    );
+    const resolvedHex = matchedColor?.hex || '#1A1A1A';
+
     const newVar = {
       id: `temp-${Date.now()}`,
       size: varSize,
       color: varColorName.trim(),
-      color_hex: varColorHex,
+      color_hex: resolvedHex,
       stock: Math.max(0, parseInt(varStock) || 0),
       isExisting: false,
     };
 
     setVariants([...variants, newVar]);
+    setVarColorName('');
     setError(null);
   };
 
@@ -324,7 +331,11 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
     }
   };
 
-  const margin = calculateMargin(parseFloat(costPrice) || 0, parseFloat(salePrice) || 0);
+  const costNum = parseFloat(costPrice) || 0;
+  const saleNum = parseFloat(salePrice) || 0;
+  const unitProfit = Math.max(0, saleNum - costNum);
+  const totalVariantUnits = variants.reduce((acc, v) => acc + (v.stock || 0), 0);
+  const totalStockProfit = unitProfit * totalVariantUnits;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto">
@@ -411,16 +422,9 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
               </div>
 
               <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label className="font-sans text-[11px] uppercase tracking-wider text-neutral-600 font-medium">
-                    Precio de Venta ($) *
-                  </label>
-                  {margin > 0 && (
-                    <span className="text-[10px] font-sans text-emerald-700 font-semibold">
-                      Margen: {margin}%
-                    </span>
-                  )}
-                </div>
+                <label className="font-sans text-[11px] uppercase tracking-wider text-neutral-600 font-medium">
+                  Precio de Venta ($) *
+                </label>
                 <input
                   type="number"
                   step="0.01"
@@ -433,6 +437,28 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                 />
               </div>
             </div>
+
+            {/* Ganancia por prenda y Ganancia total */}
+            {saleNum > 0 && (
+              <div className="p-3 bg-alabaster border border-border rounded flex items-center justify-between text-xs font-sans">
+                <div>
+                  <span className="text-[10px] text-neutral-400 uppercase tracking-wider block">
+                    Ganancia por Prenda
+                  </span>
+                  <span className="text-emerald-700 font-semibold text-sm">
+                    +{formatMoney(unitProfit)}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-neutral-400 uppercase tracking-wider block">
+                    Ganancia Total ({totalVariantUnits} uds)
+                  </span>
+                  <span className="text-emerald-800 font-semibold text-sm">
+                    +{formatMoney(totalStockProfit)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Section 2: Photo / Image */}
@@ -575,10 +601,10 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
             {/* Add variant row */}
             <div className="p-3 bg-alabaster border border-border rounded space-y-2">
               <p className="font-sans text-[10px] uppercase tracking-wider text-neutral-500 font-medium">
-                Añadir Combinación de Talla y Color
+                Añadir Talla y Color
               </p>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {/* Size */}
                 <select
                   value={varSize}
@@ -595,40 +621,26 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                 {/* Color Name */}
                 <input
                   type="text"
-                  placeholder="Nombre Color"
+                  placeholder="Color (ej: Negro, Blanco)"
                   value={varColorName}
                   onChange={(e) => setVarColorName(e.target.value)}
-                  className="input-minimal text-xs"
+                  className="input-minimal text-xs bg-white"
                 />
 
-                {/* Color Hex & Picker */}
-                <div className="flex items-center gap-1 bg-white border border-border rounded px-2">
-                  <input
-                    type="color"
-                    value={varColorHex}
-                    onChange={(e) => setVarColorHex(e.target.value)}
-                    className="w-6 h-6 border-none cursor-pointer bg-transparent"
-                    title="Seleccionar color"
-                  />
-                  <span className="font-mono text-[10px] text-neutral-500 uppercase">
-                    {varColorHex}
-                  </span>
-                </div>
-
-                {/* Initial stock */}
-                <div className="flex gap-1">
+                {/* Initial stock & Add */}
+                <div className="flex gap-1.5">
                   <input
                     type="number"
                     min="0"
                     placeholder="Stock"
                     value={varStock}
                     onChange={(e) => setVarStock(e.target.value)}
-                    className="input-minimal text-xs text-center flex-1"
+                    className="input-minimal text-xs text-center flex-1 bg-white"
                   />
                   <button
                     type="button"
                     onClick={handleAddVariant}
-                    className="btn-primary !px-3"
+                    className="btn-primary !px-3.5 flex items-center justify-center"
                     title="Agregar variante a la lista"
                   >
                     <Plus className="w-4 h-4" />

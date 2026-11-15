@@ -89,7 +89,8 @@ export function exportInventoryToCSV(products = []) {
     'Stock',
     'Costo',
     'Precio Venta',
-    'Margen %',
+    'Ganancia / Unidad',
+    'Ganancia Total',
     'Valor Costo Total',
     'Valor Venta Total'
   ];
@@ -99,7 +100,7 @@ export function exportInventoryToCSV(products = []) {
   products.forEach(p => {
     const cost = Number(p.cost_price) || 0;
     const price = Number(p.sale_price) || 0;
-    const margin = calculateMargin(cost, price);
+    const unitProfit = Math.max(0, price - cost);
 
     if (p.product_variants && p.product_variants.length > 0) {
       p.product_variants.forEach(v => {
@@ -113,7 +114,8 @@ export function exportInventoryToCSV(products = []) {
           stock,
           cost.toFixed(2),
           price.toFixed(2),
-          `${margin}%`,
+          unitProfit.toFixed(2),
+          (unitProfit * stock).toFixed(2),
           (cost * stock).toFixed(2),
           (price * stock).toFixed(2),
         ]);
@@ -128,7 +130,8 @@ export function exportInventoryToCSV(products = []) {
         0,
         cost.toFixed(2),
         price.toFixed(2),
-        `${margin}%`,
+        unitProfit.toFixed(2),
+        '0.00',
         '0.00',
         '0.00',
       ]);

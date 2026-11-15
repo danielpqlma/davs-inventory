@@ -92,7 +92,7 @@ export function MetricCards({ products = [] }) {
             </p>
             <div className="flex items-center gap-1.5 mt-1 font-sans text-[11px] text-emerald-700">
               <ArrowUpRight className="w-3.5 h-3.5" />
-              <span>+{formatMoney(potentialProfit)} ({averageMargin}%)</span>
+              <span>+{formatMoney(potentialProfit)} ganancia potencial</span>
             </div>
           </div>
         </div>

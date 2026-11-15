@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   formatMoney,
-  calculateMargin,
   getTotalStock,
   getStockStatus
 } from '../../lib/utils';
@@ -61,7 +60,10 @@ export function ProductTable({
                 Venta
               </th>
               <th className="py-3 px-4 text-right font-sans text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">
-                Margen
+                Ganancia / Prenda
+              </th>
+              <th className="py-3 px-4 text-right font-sans text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">
+                Ganancia Total
               </th>
               <th className="py-3 px-4 text-center font-sans text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">
                 Estado
@@ -75,7 +77,7 @@ export function ProductTable({
           <tbody className="divide-y divide-border">
             {products.length === 0 ? (
               <tr>
-                <td colSpan={11} className="py-12 text-center text-neutral-400 font-sans text-xs">
+                <td colSpan={12} className="py-12 text-center text-neutral-400 font-sans text-xs">
                   No se encontraron prendas con los filtros aplicados.
                 </td>
               </tr>
@@ -83,7 +85,8 @@ export function ProductTable({
               products.map((p) => {
                 const totalStock = getTotalStock(p.product_variants || []);
                 const status = getStockStatus(p.product_variants || []);
-                const margin = calculateMargin(p.cost_price, p.sale_price);
+                const unitProfit = Math.max(0, (Number(p.sale_price) || 0) - (Number(p.cost_price) || 0));
+                const totalProfit = unitProfit * totalStock;
                 const isExpanded = !!expandedRows[p.id];
 
                 // Resumen de colores únicos
@@ -197,9 +200,14 @@ export function ProductTable({
                         {formatMoney(p.sale_price)}
                       </td>
 
-                      {/* Margin */}
+                      {/* Ganancia por prenda */}
                       <td className="py-3 px-4 text-right font-sans text-xs text-emerald-700 font-medium">
-                        {margin}%
+                        +{formatMoney(unitProfit)}
+                      </td>
+
+                      {/* Ganancia total al vender todo */}
+                      <td className="py-3 px-4 text-right font-sans text-xs text-emerald-800 font-semibold">
+                        +{formatMoney(totalProfit)}
                       </td>
 
                       {/* Status */}
@@ -233,7 +241,7 @@ export function ProductTable({
                     {/* Inline Expandable Variants Matrix */}
                     {isExpanded && (
                       <tr className="bg-alabaster/70 border-b border-border">
-                        <td colSpan={11} className="py-4 px-6">
+                        <td colSpan={12} className="py-4 px-6">
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="font-sans text-[10px] uppercase tracking-widest text-neutral-500 font-semibold">

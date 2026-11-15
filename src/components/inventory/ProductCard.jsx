@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   formatMoney,
-  calculateMargin,
   getTotalStock,
   getStockStatus
 } from '../../lib/utils';
@@ -19,7 +18,8 @@ export function ProductCard({
 
   const totalStock = getTotalStock(product.product_variants || []);
   const status = getStockStatus(product.product_variants || []);
-  const margin = calculateMargin(product.cost_price, product.sale_price);
+  const unitProfit = Math.max(0, (Number(product.sale_price) || 0) - (Number(product.cost_price) || 0));
+  const totalProfit = unitProfit * totalStock;
 
   return (
     <div className="card-surface overflow-hidden">
@@ -80,13 +80,33 @@ export function ProductCard({
                 {formatMoney(product.sale_price)}
               </span>
               <span className="font-sans text-[10px] text-neutral-400">
-                (Margen {margin}%)
+                Venta
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Badge status={status} />
               <span className="font-sans text-xs text-neutral-500 font-medium">
                 {totalStock} uds
+              </span>
+            </div>
+          </div>
+
+          {/* Ganancias en producto */}
+          <div className="mt-2 pt-2 border-t border-dashed border-border/80 grid grid-cols-2 gap-2 text-xs font-sans">
+            <div>
+              <span className="text-[10px] text-neutral-400 uppercase tracking-wider block">
+                Ganancia / Prenda
+              </span>
+              <span className="text-emerald-700 font-semibold text-xs">
+                +{formatMoney(unitProfit)}
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] text-neutral-400 uppercase tracking-wider block">
+                Ganancia Total
+              </span>
+              <span className="text-emerald-800 font-semibold text-xs">
+                +{formatMoney(totalProfit)}
               </span>
             </div>
           </div>
