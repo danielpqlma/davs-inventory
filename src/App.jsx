@@ -358,7 +358,7 @@ export function App() {
                     <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
                     <input
                       type="text"
-                      placeholder="Buscar por nombre, SKU o categoría..."
+                      placeholder="Buscar por prenda o categoría..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="input-minimal pl-10 text-xs"

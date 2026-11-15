@@ -42,7 +42,7 @@ export function ProductTable({
                 Foto
               </th>
               <th className="py-3 px-4 font-sans text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">
-                Prenda / SKU
+                Prenda
               </th>
               <th className="py-3 px-4 font-sans text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">
                 Categoría
@@ -140,13 +140,10 @@ export function ProductTable({
                         </div>
                       </td>
 
-                      {/* Name & SKU */}
+                      {/* Name */}
                       <td className="py-3 px-4">
                         <p className="font-serif text-base text-ink font-normal leading-tight">
                           {p.name}
-                        </p>
-                        <p className="font-mono text-[11px] text-neutral-400 uppercase tracking-wider mt-0.5">
-                          {p.sku}
                         </p>
                       </td>
 

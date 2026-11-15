@@ -154,11 +154,6 @@ export function MovementsList({ showToast }) {
                         <p className="font-serif text-base text-ink font-normal leading-tight">
                           {product?.name || 'Prenda Desconocida'}
                         </p>
-                        {product?.sku && (
-                          <span className="font-mono text-[10px] text-neutral-400 uppercase bg-alabaster px-1.5 py-0.2 rounded border border-border">
-                            {product.sku}
-                          </span>
-                        )}
                       </div>
 
                       <div className="flex items-center gap-3 mt-1 text-xs text-neutral-500 flex-wrap">

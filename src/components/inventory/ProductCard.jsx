@@ -69,8 +69,8 @@ export function ProductCard({
               </div>
             </div>
 
-            <p className="font-mono text-[11px] text-neutral-400 uppercase mt-0.5">
-              {product.sku} · {product.category}
+            <p className="font-sans text-[11px] text-neutral-400 uppercase tracking-wider mt-0.5">
+              {product.category}
             </p>
           </div>
 

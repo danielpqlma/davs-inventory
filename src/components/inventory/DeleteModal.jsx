@@ -61,8 +61,8 @@ export function DeleteModal({ isOpen, onClose, product, onDeleted, showToast }) 
 
           <div className="p-3 bg-alabaster border border-border rounded space-y-1">
             <p className="font-serif text-lg text-ink font-normal">{product.name}</p>
-            <p className="font-mono text-xs text-neutral-500 uppercase">
-              SKU: {product.sku} · {product.category}
+            <p className="font-sans text-xs text-neutral-500 uppercase tracking-wider">
+              {product.category}
             </p>
             <p className="font-sans text-xs text-[#991B1B] font-medium pt-1">
               Se eliminarán {product.product_variants?.length || 0} variantes y {totalUnits} unidades de stock físico.
