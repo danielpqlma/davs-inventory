@@ -448,28 +448,14 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
                   <span className="text-emerald-700 font-semibold text-sm">
                     +{formatMoney(unitProfit)}
                   </span>
-                  <span className="text-[10px] text-neutral-400 block mt-0.5">
-                    ({formatMoney(saleNum)} venta - {formatMoney(costNum)} costo)
-                  </span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-neutral-400 uppercase tracking-wider block">
-                    Ganancia Total en Stock
+                    Ganancia Total ({totalVariantUnits} uds)
                   </span>
-                  {totalVariantUnits > 0 ? (
-                    <>
-                      <span className="text-emerald-800 font-semibold text-sm">
-                        +{formatMoney(totalStockProfit)}
-                      </span>
-                      <span className="text-[10px] text-neutral-400 block mt-0.5">
-                        ({totalVariantUnits} uds × {formatMoney(unitProfit)})
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-neutral-400 text-xs italic block mt-0.5">
-                      Añade tallas abajo para calcular
-                    </span>
-                  )}
+                  <span className="text-emerald-800 font-semibold text-sm">
+                    +{formatMoney(totalStockProfit)}
+                  </span>
                 </div>
               </div>
             )}
