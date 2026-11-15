@@ -53,10 +53,6 @@ export function LoginView() {
           <span className="font-serif text-3xl md:text-4xl font-normal tracking-tight text-ink">
             Dav's
           </span>
-          <span className="text-neutral-300 text-sm">/</span>
-          <span className="font-sans text-[11px] uppercase tracking-widest text-neutral-500 font-medium">
-            Atelier & Retail
-          </span>
         </div>
       </header>
 
@@ -174,7 +170,7 @@ export function LoginView() {
 
       {/* Footer Info */}
       <footer className="text-center font-sans text-[11px] text-neutral-400">
-        <p>Dav's Atelier Retail System © {new Date().getFullYear()} — Uso exclusivo del personal autorizado.</p>
+        <p>Dav's © {new Date().getFullYear()} — Uso exclusivo del personal autorizado.</p>
       </footer>
     </div>
   );
