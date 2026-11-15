@@ -154,10 +154,6 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
       setError('El nombre de la prenda es requerido.');
       return;
     }
-    if (!sku.trim()) {
-      setError('El código SKU es obligatorio.');
-      return;
-    }
     const saleNum = parseFloat(salePrice);
     if (isNaN(saleNum) || saleNum <= 0) {
       setError('Ingresa un precio de venta válido mayor a 0.');
@@ -187,14 +183,14 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
 
       const costNum = parseFloat(costPrice) || 0;
 
-      // 2. Operación contra Supabase PostgreSQL
+      // 2. Operación contra base de datos
       if (isEditing) {
         // Actualizar producto en 'products'
         const { error: prodErr } = await supabase
           .from('products')
           .update({
             name: name.trim(),
-            sku: sku.trim().toUpperCase(),
+            sku: (sku || productToEdit.sku || generateSKU(category)).trim().toUpperCase(),
             category,
             cost_price: costNum,
             sale_price: saleNum,
@@ -271,7 +267,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
           .from('products')
           .insert({
             name: name.trim(),
-            sku: sku.trim().toUpperCase(),
+            sku: (sku || generateSKU(category)).trim().toUpperCase(),
             category,
             cost_price: costNum,
             sale_price: saleNum,
@@ -340,7 +336,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
               {isEditing ? 'Editar Prenda' : 'Nueva Prenda'}
             </h2>
             <p className="font-sans text-[11px] text-neutral-400 uppercase tracking-widest mt-0.5">
-              {isEditing ? `Modificando SKU: ${sku}` : 'Registro de alta de catálogo Dav\'s'}
+              {isEditing ? `Modificando: ${productToEdit?.name || 'Prenda'}` : 'Registro de alta de prenda'}
             </p>
           </div>
           <button
@@ -398,31 +394,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label className="font-sans text-[11px] uppercase tracking-wider text-neutral-600 font-medium">
-                    Código SKU *
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setSku(generateSKU(category))}
-                    className="text-[10px] text-neutral-500 hover:text-ink flex items-center gap-1 underline"
-                  >
-                    <Sparkles className="w-3 h-3 text-[#B89B72]" />
-                    Generar
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  required
-                  placeholder="DAV-BL01"
-                  value={sku}
-                  onChange={(e) => setSku(e.target.value.toUpperCase())}
-                  className="input-minimal text-xs font-mono tracking-wider"
-                />
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="font-sans text-[11px] uppercase tracking-wider text-neutral-600 font-medium">
                   Costo de Compra ($)
