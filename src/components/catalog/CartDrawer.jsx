@@ -2,9 +2,18 @@ import React, { useState } from 'react';
 import { formatMoney } from '../../lib/utils';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, MessageCircle } from 'lucide-react';
 
-const WHATSAPP_NUMBER = '584242313462';
+const DEFAULT_WHATSAPP = '584242313462';
 
-export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onRemoveItem, onClearCart }) {
+export function CartDrawer({
+  isOpen,
+  onClose,
+  cart,
+  onUpdateQuantity,
+  onRemoveItem,
+  onClearCart,
+  whatsappNumber,
+  storeName = "Dav's",
+}) {
   const [customerName, setCustomerName] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
 
@@ -16,7 +25,8 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onRemoveIt
   const handleSendWhatsApp = () => {
     if (cart.length === 0) return;
 
-    let message = `✨ *¡Hola Dav's! Deseo realizar el siguiente pedido:*\n\n`;
+    const brandName = storeName || "Dav's";
+    let message = `✨ *¡Hola ${brandName}! Deseo realizar el siguiente pedido:*\n\n`;
 
     if (customerName.trim()) {
       message += `👤 *Cliente:* ${customerName.trim()}\n`;
@@ -43,8 +53,10 @@ export function CartDrawer({ isOpen, onClose, cart, onUpdateQuantity, onRemoveIt
     message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
     message += `¿Tienen disponibilidad de estas prendas para coordinar la entrega y forma de pago? ¡Muchas gracias!`;
 
+    const rawNumber = (whatsappNumber || DEFAULT_WHATSAPP).replace(/\D/g, '');
+    const targetNumber = rawNumber || DEFAULT_WHATSAPP;
     const encoded = encodeURIComponent(message);
-    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
+    const waUrl = `https://wa.me/${targetNumber}?text=${encoded}`;
     window.open(waUrl, '_blank');
   };
 

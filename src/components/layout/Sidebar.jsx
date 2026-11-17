@@ -11,7 +11,8 @@ import {
   LogOut,
   Database,
   Printer,
-  ShoppingBag
+  ShoppingBag,
+  MessageCircle
 } from 'lucide-react';
 
 export function Sidebar({
@@ -20,6 +21,7 @@ export function Sidebar({
   onNewProduct,
   onExportCSV,
   onOpenCatalog,
+  onOpenStoreSettings,
   itemCount = 0,
   lowStockCount = 0,
 }) {
@@ -127,6 +129,15 @@ export function Sidebar({
         >
           <ShoppingBag className="w-3.5 h-3.5 text-[#B89B72]" />
           <span>Catálogo de Clientes</span>
+        </button>
+
+        <button
+          onClick={onOpenStoreSettings}
+          className="btn-secondary w-full !py-2 !px-3 text-xs flex items-center justify-center gap-2 border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors"
+          title="Configurar tu número de WhatsApp para recibir pedidos"
+        >
+          <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Configurar WhatsApp</span>
         </button>
 
         <div className="grid grid-cols-2 gap-2">

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Download, RefreshCw, ShoppingBag } from 'lucide-react';
+import { Download, RefreshCw, ShoppingBag, MessageCircle } from 'lucide-react';
 
-export function Header({ onExportCSV, onRefresh, isRefreshing, onOpenCatalog }) {
+export function Header({ onExportCSV, onRefresh, isRefreshing, onOpenCatalog, onOpenStoreSettings }) {
   return (
     <header className="md:hidden bg-white border-b border-border sticky top-0 z-30 px-4 py-3.5 flex items-center justify-between no-print">
       <div className="flex items-center gap-2">
@@ -15,6 +15,16 @@ export function Header({ onExportCSV, onRefresh, isRefreshing, onOpenCatalog }) 
       </div>
 
       <div className="flex items-center gap-1.5">
+        {onOpenStoreSettings && (
+          <button
+            onClick={onOpenStoreSettings}
+            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
+            title="Configurar WhatsApp de pedidos"
+          >
+            <MessageCircle className="w-4 h-4" />
+          </button>
+        )}
+
         {onOpenCatalog && (
           <button
             onClick={onOpenCatalog}

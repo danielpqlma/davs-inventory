@@ -18,13 +18,26 @@ import {
   Lock
 } from 'lucide-react';
 
-const WHATSAPP_NUMBER = '584242313462';
+const DEFAULT_WHATSAPP = '584242313462';
 
 export function CustomerCatalog({ onAdminAccess }) {
+  // Read store parameters from URL
+  const searchParams = useMemo(() => {
+    return typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search)
+      : new URLSearchParams();
+  }, []);
+
+  const storeId = searchParams.get('tienda') || searchParams.get('id');
+  const waFromUrl = searchParams.get('wa');
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const [storeWhatsApp, setStoreWhatsApp] = useState(waFromUrl || DEFAULT_WHATSAPP);
+  const [storeBrandName, setStoreBrandName] = useState("Dav's");
 
   // Modals & Drawers
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -32,10 +45,11 @@ export function CustomerCatalog({ onAdminAccess }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
-  // Cart State (Persisted in localStorage)
+  // Cart State (Persisted in localStorage per store)
+  const cartStorageKey = storeId ? `davs_cart_${storeId}` : 'davs_customer_cart';
   const [cart, setCart] = useState(() => {
     try {
-      const saved = localStorage.getItem('davs_customer_cart');
+      const saved = localStorage.getItem(cartStorageKey);
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -51,21 +65,40 @@ export function CustomerCatalog({ onAdminAccess }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('davs_customer_cart', JSON.stringify(cart));
+      localStorage.setItem(cartStorageKey, JSON.stringify(cart));
     } catch (e) {
       console.warn('No se pudo guardar el carrito:', e);
     }
-  }, [cart]);
+  }, [cart, cartStorageKey]);
 
   // Fetch products public catalog
   const fetchCatalog = async () => {
     setLoading(true);
     try {
-      // Nota de seguridad: NO solicitamos 'cost_price' ni datos sensibles.
-      const { data, error } = await supabase
+      // 1. Fetch store profile if storeId is given
+      if (storeId) {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('whatsapp_number, store_name')
+            .eq('id', storeId)
+            .maybeSingle();
+
+          if (profile) {
+            if (profile.whatsapp_number) setStoreWhatsApp(profile.whatsapp_number);
+            if (profile.store_name) setStoreBrandName(profile.store_name);
+          }
+        } catch (profErr) {
+          console.warn('No se pudo cargar el perfil:', profErr);
+        }
+      }
+
+      // 2. Fetch products (Nota de seguridad: NO solicitamos 'cost_price' ni datos sensibles)
+      let query = supabase
         .from('products')
         .select(`
           id,
+          user_id,
           name,
           category,
           sale_price,
@@ -82,6 +115,12 @@ export function CustomerCatalog({ onAdminAccess }) {
         `)
         .order('created_at', { ascending: false });
 
+      // Si se especifica una tienda, aislamos exclusivamente a las prendas de esa cuenta
+      if (storeId) {
+        query = query.eq('user_id', storeId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       setProducts(data || []);
     } catch (err) {
@@ -93,7 +132,7 @@ export function CustomerCatalog({ onAdminAccess }) {
 
   useEffect(() => {
     fetchCatalog();
-  }, []);
+  }, [storeId]);
 
   // Filter products
   const filteredProducts = useMemo(() => {
@@ -158,7 +197,7 @@ export function CustomerCatalog({ onAdminAccess }) {
       {/* Editorial Announcement Bar */}
       <div className="bg-ink text-white py-2 px-4 text-center font-sans text-[11px] uppercase tracking-widest flex items-center justify-center gap-2">
         <Sparkles className="w-3.5 h-3.5 text-[#B89B72]" />
-        <span>Colección Dav's · Envíos y Entregas por WhatsApp</span>
+        <span>Colección {storeBrandName} · Envíos y Entregas por WhatsApp</span>
       </div>
 
       {/* Main Luxury Storefront Header */}
@@ -167,7 +206,7 @@ export function CustomerCatalog({ onAdminAccess }) {
           {/* Logo & Brand */}
           <div className="flex items-baseline gap-2 cursor-pointer" onClick={() => setSelectedCategory('all')}>
             <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-ink">
-              Dav's
+              {storeBrandName}
             </h1>
             <span className="font-sans text-[10px] uppercase tracking-widest text-[#B89B72] font-semibold">
               Tienda
@@ -177,11 +216,11 @@ export function CustomerCatalog({ onAdminAccess }) {
           {/* Actions: Direct WhatsApp & Bag Button */}
           <div className="flex items-center gap-2.5">
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola Dav\'s, tengo una consulta sobre sus prendas.')}`}
+              href={`https://wa.me/${storeWhatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${storeBrandName}, tengo una consulta sobre sus prendas.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-sans text-neutral-600 hover:text-ink hover:bg-alabaster rounded border border-border transition-colors"
-              title="Contacto directo"
+              title="Contacto directo por WhatsApp"
             >
               <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
               <span>Atención WhatsApp</span>
@@ -444,12 +483,12 @@ export function CustomerCatalog({ onAdminAccess }) {
 
           <div className="flex items-center gap-4 text-xs font-sans text-neutral-500">
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              href={`https://wa.me/${storeWhatsApp.replace(/\D/g, '')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-ink underline"
             >
-              WhatsApp (+58 424-2313462)
+              WhatsApp ({storeWhatsApp})
             </a>
             <span>·</span>
             {onAdminAccess && (
@@ -485,6 +524,8 @@ export function CustomerCatalog({ onAdminAccess }) {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onClearCart={() => setCart([])}
+        whatsappNumber={storeWhatsApp}
+        storeName={storeBrandName}
       />
 
       <ImagePreviewModal

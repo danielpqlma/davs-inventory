@@ -19,6 +19,7 @@ import { DeleteModal } from './components/inventory/DeleteModal';
 import { MovementsList } from './components/movements/MovementsList';
 import { ImagePreviewModal } from './components/ui/ImagePreviewModal';
 import { CustomerCatalog } from './components/catalog/CustomerCatalog';
+import { StoreSettingsModal } from './components/settings/StoreSettingsModal';
 
 // Icons
 import {
@@ -81,6 +82,7 @@ export function App() {
   const [productToEdit, setProductToEdit] = useState(null);
   const [productToDelete, setProductToDelete] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [isStoreSettingsOpen, setIsStoreSettingsOpen] = useState(false);
 
   // Toast Notification
   const [toast, setToast] = useState(null);
@@ -332,6 +334,7 @@ export function App() {
           window.location.hash = 'catalogo';
           setViewMode('catalog');
         }}
+        onOpenStoreSettings={() => setIsStoreSettingsOpen(true)}
         itemCount={products.length}
         lowStockCount={lowStockCount}
       />
@@ -347,6 +350,7 @@ export function App() {
             window.location.hash = 'catalogo';
             setViewMode('catalog');
           }}
+          onOpenStoreSettings={() => setIsStoreSettingsOpen(true)}
         />
 
         <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
@@ -596,6 +600,13 @@ export function App() {
       <ImagePreviewModal
         preview={previewImage}
         onClose={() => setPreviewImage(null)}
+      />
+
+      {/* Store & WhatsApp Settings Modal */}
+      <StoreSettingsModal
+        isOpen={isStoreSettingsOpen}
+        onClose={() => setIsStoreSettingsOpen(false)}
+        showToast={showToast}
       />
 
       {/* Feedback Toast */}
