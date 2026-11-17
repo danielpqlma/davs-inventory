@@ -202,6 +202,7 @@ export function ProductModal({ isOpen, onClose, productToEdit, onSaved, showToas
             cost_price: costNum,
             sale_price: saleNum,
             image_url: finalImageUrl || null,
+            user_id: productToEdit.user_id || user?.id,
           })
           .eq('id', productToEdit.id);
 

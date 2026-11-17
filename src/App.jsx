@@ -92,9 +92,9 @@ export function App() {
     setTimeout(() => setToast(null), 3500);
   }, []);
 
-  // Fetch all products with their variants from Supabase
+  // Fetch all products with their variants from Supabase (strictly for current user)
   const fetchProducts = useCallback(async (isSilent = false) => {
-    if (!isSupabaseConfigured()) {
+    if (!isSupabaseConfigured() || !user?.id) {
       setLoadingProducts(false);
       return;
     }
@@ -103,10 +103,12 @@ export function App() {
     else setIsRefreshing(true);
 
     try {
-      const { data, error } = await supabase
+      const PRIMARY_STORE_ID = 'dca68e83-9c30-4d1e-84e4-00bd2eb0b9b5';
+      let query = supabase
         .from('products')
         .select(`
           id,
+          user_id,
           sku,
           name,
           category,
@@ -123,8 +125,23 @@ export function App() {
             stock,
             created_at
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
+
+      if (user.id === PRIMARY_STORE_ID) {
+        query = query.or(`user_id.eq.${PRIMARY_STORE_ID},user_id.is.null`);
+        // Reclamar en segundo plano las prendas iniciales sin user_id
+        supabase
+          .from('products')
+          .update({ user_id: PRIMARY_STORE_ID })
+          .is('user_id', null)
+          .then(() => {});
+      } else {
+        query = query.eq('user_id', user.id);
+      }
+
+      query = query.order('created_at', { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setProducts(data || []);
@@ -135,14 +152,14 @@ export function App() {
       setLoadingProducts(false);
       setIsRefreshing(false);
     }
-  }, [showToast]);
+  }, [user?.id, showToast]);
 
-  // Initial load
+  // Initial load when user authenticates or changes
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user?.id) {
       fetchProducts();
     }
-  }, [isAuthenticated, fetchProducts]);
+  }, [isAuthenticated, user?.id, fetchProducts]);
 
   // Real-time optimistic stock adjustment (+1 / -1)
   const handleAdjustStock = async (variant, delta, productName) => {
@@ -264,6 +281,30 @@ export function App() {
     );
   }
 
+  // Handle navigation to customer catalog with store parameters
+  const handleOpenCatalog = () => {
+    if (user?.id) {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tienda', user.id);
+        const savedWa = localStorage.getItem(`davs_wa_${user.id}`);
+        if (savedWa) url.searchParams.set('wa', savedWa.replace(/\D/g, ''));
+        window.history.replaceState({}, '', url.toString());
+      } catch (e) {}
+    }
+    window.location.hash = 'catalogo';
+    setViewMode('catalog');
+  };
+
+  const handleCopyCatalogLink = () => {
+    if (!user?.id) return;
+    const savedWa = localStorage.getItem(`davs_wa_${user.id}`);
+    const cleanWa = savedWa ? savedWa.replace(/\D/g, '') : '';
+    const url = `${window.location.origin}/catalogo?tienda=${user.id}${cleanWa ? `&wa=${cleanWa}` : ''}`;
+    navigator.clipboard.writeText(url);
+    showToast('Enlace de tu catálogo copiado para compartir con clientes', 'success');
+  };
+
   // 1. Customer Catalog View (Public)
   if (viewMode === 'catalog') {
     return (
@@ -277,10 +318,7 @@ export function App() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/catalogo`);
-                  showToast('Enlace copiado para compartir con clientes', 'success');
-                }}
+                onClick={handleCopyCatalogLink}
                 className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-[11px] font-sans transition-colors"
               >
                 Copiar Enlace
@@ -300,6 +338,7 @@ export function App() {
         )}
 
         <CustomerCatalog
+          currentUserId={user?.id}
           onAdminAccess={() => {
             window.location.hash = 'admin';
             setViewMode('admin');
@@ -330,10 +369,7 @@ export function App() {
         onNavigate={setCurrentView}
         onNewProduct={handleNewProduct}
         onExportCSV={handleExportCSV}
-        onOpenCatalog={() => {
-          window.location.hash = 'catalogo';
-          setViewMode('catalog');
-        }}
+        onOpenCatalog={handleOpenCatalog}
         onOpenStoreSettings={() => setIsStoreSettingsOpen(true)}
         itemCount={products.length}
         lowStockCount={lowStockCount}
@@ -346,10 +382,7 @@ export function App() {
           onExportCSV={handleExportCSV}
           onRefresh={() => fetchProducts(true)}
           isRefreshing={isRefreshing}
-          onOpenCatalog={() => {
-            window.location.hash = 'catalogo';
-            setViewMode('catalog');
-          }}
+          onOpenCatalog={handleOpenCatalog}
           onOpenStoreSettings={() => setIsStoreSettingsOpen(true)}
         />
 

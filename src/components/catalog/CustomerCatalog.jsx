@@ -19,25 +19,49 @@ import {
 } from 'lucide-react';
 
 const DEFAULT_WHATSAPP = '584242313462';
+const PRIMARY_STORE_ID = 'dca68e83-9c30-4d1e-84e4-00bd2eb0b9b5';
 
-export function CustomerCatalog({ onAdminAccess }) {
-  // Read store parameters from URL
-  const searchParams = useMemo(() => {
-    return typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search)
-      : new URLSearchParams();
-  }, []);
+export function CustomerCatalog({ onAdminAccess, currentUserId }) {
+  // Read store parameters from URL (search query or hash)
+  const getParam = (name) => {
+    if (typeof window === 'undefined') return null;
+    const searchParams = new URLSearchParams(window.location.search);
+    const fromSearch = searchParams.get(name);
+    if (fromSearch) return fromSearch;
 
-  const storeId = searchParams.get('tienda') || searchParams.get('id');
-  const waFromUrl = searchParams.get('wa');
+    if (window.location.hash && window.location.hash.includes('?')) {
+      const hashQuery = window.location.hash.substring(window.location.hash.indexOf('?') + 1);
+      const hashParams = new URLSearchParams(hashQuery);
+      return hashParams.get(name);
+    }
+    return null;
+  };
+
+  const urlStoreId = getParam('tienda') || getParam('id');
+  const targetStoreId = urlStoreId || currentUserId || PRIMARY_STORE_ID;
+  const waFromUrl = getParam('wa');
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const [storeWhatsApp, setStoreWhatsApp] = useState(waFromUrl || DEFAULT_WHATSAPP);
-  const [storeBrandName, setStoreBrandName] = useState("Dav's");
+  const [storeWhatsApp, setStoreWhatsApp] = useState(() => {
+    if (waFromUrl) return waFromUrl;
+    if (typeof window !== 'undefined' && targetStoreId) {
+      const saved = localStorage.getItem(`davs_wa_${targetStoreId}`);
+      if (saved) return saved;
+    }
+    return DEFAULT_WHATSAPP;
+  });
+
+  const [storeBrandName, setStoreBrandName] = useState(() => {
+    if (typeof window !== 'undefined' && targetStoreId) {
+      const saved = localStorage.getItem(`davs_store_${targetStoreId}`);
+      if (saved) return saved;
+    }
+    return "Dav's";
+  });
 
   // Modals & Drawers
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -46,7 +70,7 @@ export function CustomerCatalog({ onAdminAccess }) {
   const [previewImage, setPreviewImage] = useState(null);
 
   // Cart State (Persisted in localStorage per store)
-  const cartStorageKey = storeId ? `davs_cart_${storeId}` : 'davs_customer_cart';
+  const cartStorageKey = `davs_cart_${targetStoreId}`;
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem(cartStorageKey);
@@ -75,25 +99,32 @@ export function CustomerCatalog({ onAdminAccess }) {
   const fetchCatalog = async () => {
     setLoading(true);
     try {
-      // 1. Fetch store profile if storeId is given
-      if (storeId) {
+      // 1. Fetch store profile
+      if (targetStoreId) {
         try {
           const { data: profile } = await supabase
             .from('profiles')
             .select('whatsapp_number, store_name')
-            .eq('id', storeId)
+            .eq('id', targetStoreId)
             .maybeSingle();
 
           if (profile) {
             if (profile.whatsapp_number) setStoreWhatsApp(profile.whatsapp_number);
             if (profile.store_name) setStoreBrandName(profile.store_name);
+          } else if (waFromUrl) {
+            setStoreWhatsApp(waFromUrl);
+          } else if (typeof window !== 'undefined') {
+            const savedWa = localStorage.getItem(`davs_wa_${targetStoreId}`);
+            if (savedWa) setStoreWhatsApp(savedWa);
+            const savedName = localStorage.getItem(`davs_store_${targetStoreId}`);
+            if (savedName) setStoreBrandName(savedName);
           }
         } catch (profErr) {
           console.warn('No se pudo cargar el perfil:', profErr);
         }
       }
 
-      // 2. Fetch products (Nota de seguridad: NO solicitamos 'cost_price' ni datos sensibles)
+      // 2. Fetch products for this specific store only
       let query = supabase
         .from('products')
         .select(`
@@ -112,13 +143,15 @@ export function CustomerCatalog({ onAdminAccess }) {
             color_hex,
             stock
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
 
-      // Si se especifica una tienda, aislamos exclusivamente a las prendas de esa cuenta
-      if (storeId) {
-        query = query.eq('user_id', storeId);
+      if (targetStoreId === PRIMARY_STORE_ID) {
+        query = query.or(`user_id.eq.${PRIMARY_STORE_ID},user_id.is.null`);
+      } else {
+        query = query.eq('user_id', targetStoreId);
       }
+
+      query = query.order('created_at', { ascending: false });
 
       const { data, error } = await query;
       if (error) throw error;
@@ -132,7 +165,7 @@ export function CustomerCatalog({ onAdminAccess }) {
 
   useEffect(() => {
     fetchCatalog();
-  }, [storeId]);
+  }, [targetStoreId]);
 
   // Filter products
   const filteredProducts = useMemo(() => {
