@@ -194,12 +194,6 @@ export function CustomerCatalog({ onAdminAccess }) {
 
   return (
     <div className="min-h-screen bg-white text-ink flex flex-col selection:bg-ink selection:text-white">
-      {/* Editorial Announcement Bar */}
-      <div className="bg-ink text-white py-2 px-4 text-center font-sans text-[11px] uppercase tracking-widest flex items-center justify-center gap-2">
-        <Sparkles className="w-3.5 h-3.5 text-[#B89B72]" />
-        <span>Colección {storeBrandName} · Envíos y Entregas por WhatsApp</span>
-      </div>
-
       {/* Main Luxury Storefront Header */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-border transition-all">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
