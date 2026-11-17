@@ -18,6 +18,7 @@ import { ProductModal } from './components/inventory/ProductModal';
 import { DeleteModal } from './components/inventory/DeleteModal';
 import { MovementsList } from './components/movements/MovementsList';
 import { ImagePreviewModal } from './components/ui/ImagePreviewModal';
+import { CustomerCatalog } from './components/catalog/CustomerCatalog';
 
 // Icons
 import {
@@ -34,6 +35,32 @@ import {
 
 export function App() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
+
+  // Mode: 'catalog' (public store) | 'admin' (internal inventory)
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window === 'undefined') return 'catalog';
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    const search = window.location.search.toLowerCase();
+
+    if (path.startsWith('/admin') || hash === '#admin' || search.includes('admin')) {
+      return 'admin';
+    }
+    if (path.startsWith('/catalogo') || hash === '#catalogo' || search.includes('catalogo')) {
+      return 'catalog';
+    }
+    return 'catalog';
+  });
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#admin') setViewMode('admin');
+      else if (hash === '#catalogo') setViewMode('catalog');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   // Navigation State: 'dashboard' | 'inventory' | 'movements'
   const [currentView, setCurrentView] = useState('inventory');
@@ -229,15 +256,68 @@ export function App() {
         </div>
         <p className="font-serif text-2xl font-light text-ink tracking-tight">Dav's</p>
         <p className="font-sans text-[11px] uppercase tracking-widest text-neutral-400 mt-1">
-          Cargando credenciales de acceso...
+          Cargando...
         </p>
       </div>
     );
   }
 
-  // Auth Guard: If not authenticated, require login
+  // 1. Customer Catalog View (Public)
+  if (viewMode === 'catalog') {
+    return (
+      <div className="relative">
+        {/* Top Admin Switch Bar if owner is authenticated */}
+        {isAuthenticated && (
+          <aside className="bg-ink text-white px-4 py-2 text-xs flex items-center justify-between border-b border-neutral-800 sticky top-0 z-50">
+            <span className="font-sans text-[11px] uppercase tracking-wider text-[#B89B72] font-semibold">
+              ✦ Modo Vista Previa · Catálogo de Clientes
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/catalogo`);
+                  showToast('Enlace copiado para compartir con clientes', 'success');
+                }}
+                className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-[11px] font-sans transition-colors"
+              >
+                Copiar Enlace
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.hash = 'admin';
+                  setViewMode('admin');
+                }}
+                className="px-3 py-1 bg-white text-ink hover:bg-neutral-100 rounded text-[11px] font-sans font-medium transition-colors"
+              >
+                Volver al Panel
+              </button>
+            </div>
+          </aside>
+        )}
+
+        <CustomerCatalog
+          onAdminAccess={() => {
+            window.location.hash = 'admin';
+            setViewMode('admin');
+          }}
+        />
+        <Toast toast={toast} onClose={() => setToast(null)} />
+      </div>
+    );
+  }
+
+  // 2. Admin Login Guard: If not authenticated and admin mode requested
   if (!isAuthenticated) {
-    return <LoginView />;
+    return (
+      <LoginView
+        onBackToCatalog={() => {
+          window.location.hash = 'catalogo';
+          setViewMode('catalog');
+        }}
+      />
+    );
   }
 
   return (
@@ -248,6 +328,10 @@ export function App() {
         onNavigate={setCurrentView}
         onNewProduct={handleNewProduct}
         onExportCSV={handleExportCSV}
+        onOpenCatalog={() => {
+          window.location.hash = 'catalogo';
+          setViewMode('catalog');
+        }}
         itemCount={products.length}
         lowStockCount={lowStockCount}
       />
@@ -259,6 +343,10 @@ export function App() {
           onExportCSV={handleExportCSV}
           onRefresh={() => fetchProducts(true)}
           isRefreshing={isRefreshing}
+          onOpenCatalog={() => {
+            window.location.hash = 'catalogo';
+            setViewMode('catalog');
+          }}
         />
 
         <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">

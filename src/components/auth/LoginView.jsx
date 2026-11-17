@@ -4,7 +4,7 @@ import { isSupabaseConfigured } from '../../lib/supabase';
 import { SupabaseConfigModal } from './SupabaseConfigModal';
 import { ArrowRight, Lock, Mail, AlertCircle, Settings, ShieldCheck } from 'lucide-react';
 
-export function LoginView() {
+export function LoginView({ onBackToCatalog }) {
   const { signIn, signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,6 +54,16 @@ export function LoginView() {
             Dav's
           </span>
         </div>
+        {onBackToCatalog && (
+          <button
+            type="button"
+            onClick={onBackToCatalog}
+            className="text-xs font-sans text-neutral-500 hover:text-ink transition-colors flex items-center gap-1.5"
+          >
+            <span>Ver Catálogo</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        )}
       </header>
 
       {/* Centered Editorial Form */}

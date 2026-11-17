@@ -10,7 +10,8 @@ import {
   Download,
   LogOut,
   Database,
-  Printer
+  Printer,
+  ShoppingBag
 } from 'lucide-react';
 
 export function Sidebar({
@@ -18,6 +19,7 @@ export function Sidebar({
   onNavigate,
   onNewProduct,
   onExportCSV,
+  onOpenCatalog,
   itemCount = 0,
   lowStockCount = 0,
 }) {
@@ -116,6 +118,15 @@ export function Sidebar({
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Nueva Prenda</span>
+        </button>
+
+        <button
+          onClick={onOpenCatalog}
+          className="btn-secondary w-full !py-2 !px-3 text-xs flex items-center justify-center gap-2 border-[#EFE7D8] bg-[#FAF6EE] text-[#B89B72] hover:bg-[#F5EEDC] transition-colors"
+          title="Ver o compartir el catálogo de clientes"
+        >
+          <ShoppingBag className="w-3.5 h-3.5 text-[#B89B72]" />
+          <span>Catálogo de Clientes</span>
         </button>
 
         <div className="grid grid-cols-2 gap-2">

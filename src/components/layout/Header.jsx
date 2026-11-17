@@ -1,7 +1,7 @@
 import React from 'react';
-import { Download, RefreshCw } from 'lucide-react';
+import { Download, RefreshCw, ShoppingBag } from 'lucide-react';
 
-export function Header({ onExportCSV, onRefresh, isRefreshing }) {
+export function Header({ onExportCSV, onRefresh, isRefreshing, onOpenCatalog }) {
   return (
     <header className="md:hidden bg-white border-b border-border sticky top-0 z-30 px-4 py-3.5 flex items-center justify-between no-print">
       <div className="flex items-center gap-2">
@@ -15,6 +15,16 @@ export function Header({ onExportCSV, onRefresh, isRefreshing }) {
       </div>
 
       <div className="flex items-center gap-1.5">
+        {onOpenCatalog && (
+          <button
+            onClick={onOpenCatalog}
+            className="p-2 text-[#B89B72] hover:bg-[#FAF6EE] rounded transition-colors"
+            title="Ver catálogo de clientes"
+          >
+            <ShoppingBag className="w-4 h-4" />
+          </button>
+        )}
+
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
