@@ -13,6 +13,7 @@ export function ProductCard({
   onEdit,
   onDelete,
   updatingVariantId,
+  onPreviewImage,
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -26,7 +27,21 @@ export function ProductCard({
       {/* Main summary row */}
       <div className="p-4 flex gap-3.5">
         {/* Product photo */}
-        <div className="w-18 h-22 w-16 h-20 bg-alabaster border border-border rounded flex-shrink-0 overflow-hidden flex items-center justify-center relative">
+        <div
+          onClick={() => {
+            if (product.image_url && onPreviewImage) {
+              onPreviewImage({
+                url: product.image_url,
+                name: product.name,
+                category: product.category,
+              });
+            }
+          }}
+          className={`w-16 h-20 bg-alabaster border border-border rounded flex-shrink-0 overflow-hidden flex items-center justify-center relative ${
+            product.image_url ? 'cursor-zoom-in active:scale-95 transition-transform' : ''
+          }`}
+          title={product.image_url ? 'Ver foto en grande' : ''}
+        >
           {product.image_url ? (
             <img
               src={product.image_url}
@@ -74,15 +89,28 @@ export function ProductCard({
             </p>
           </div>
 
-          <div className="flex items-center justify-between mt-2 pt-1 border-t border-border/60">
-            <div className="flex items-baseline gap-2">
-              <span className="font-sans text-sm font-medium text-ink">
-                {formatMoney(product.sale_price)}
-              </span>
-              <span className="font-sans text-[10px] text-neutral-400">
-                Venta
-              </span>
+          {/* Precios: Costo de compra y Precio de venta */}
+          <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-border/60">
+            <div className="flex items-baseline gap-3">
+              <div>
+                <span className="font-sans text-[9px] uppercase tracking-wider text-neutral-400 block">
+                  Compra
+                </span>
+                <span className="font-sans text-xs text-neutral-500 font-medium">
+                  {formatMoney(product.cost_price)}
+                </span>
+              </div>
+              <span className="text-neutral-200 text-xs">/</span>
+              <div>
+                <span className="font-sans text-[9px] uppercase tracking-wider text-neutral-400 block">
+                  Venta
+                </span>
+                <span className="font-sans text-sm font-semibold text-ink">
+                  {formatMoney(product.sale_price)}
+                </span>
+              </div>
             </div>
+
             <div className="flex items-center gap-2">
               <Badge status={status} />
               <span className="font-sans text-xs text-neutral-500 font-medium">

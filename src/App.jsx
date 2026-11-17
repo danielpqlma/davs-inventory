@@ -17,6 +17,7 @@ import { ProductCard } from './components/inventory/ProductCard';
 import { ProductModal } from './components/inventory/ProductModal';
 import { DeleteModal } from './components/inventory/DeleteModal';
 import { MovementsList } from './components/movements/MovementsList';
+import { ImagePreviewModal } from './components/ui/ImagePreviewModal';
 
 // Icons
 import {
@@ -52,6 +53,7 @@ export function App() {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   // Toast Notification
   const [toast, setToast] = useState(null);
@@ -436,6 +438,7 @@ export function App() {
                       onEdit={handleEditProduct}
                       onDelete={(p) => setProductToDelete(p)}
                       updatingVariantId={updatingVariantId}
+                      onPreviewImage={setPreviewImage}
                     />
                   </div>
 
@@ -454,6 +457,7 @@ export function App() {
                           onEdit={handleEditProduct}
                           onDelete={(prod) => setProductToDelete(prod)}
                           updatingVariantId={updatingVariantId}
+                          onPreviewImage={setPreviewImage}
                         />
                       ))
                     )}
@@ -498,6 +502,12 @@ export function App() {
         product={productToDelete}
         onDeleted={() => fetchProducts(true)}
         showToast={showToast}
+      />
+
+      {/* Image Preview Lightbox Modal */}
+      <ImagePreviewModal
+        preview={previewImage}
+        onClose={() => setPreviewImage(null)}
       />
 
       {/* Feedback Toast */}

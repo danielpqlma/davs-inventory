@@ -21,6 +21,7 @@ export function ProductTable({
   onEdit,
   onDelete,
   updatingVariantId,
+  onPreviewImage,
 }) {
   const [expandedRows, setExpandedRows] = useState({});
 
@@ -123,7 +124,21 @@ export function ProductTable({
 
                       {/* Photo Thumbnail */}
                       <td className="py-3 px-3">
-                        <div className="w-10 h-12 bg-alabaster border border-border rounded overflow-hidden flex items-center justify-center">
+                        <div
+                          onClick={() => {
+                            if (p.image_url && onPreviewImage) {
+                              onPreviewImage({
+                                url: p.image_url,
+                                name: p.name,
+                                category: p.category,
+                              });
+                            }
+                          }}
+                          className={`w-10 h-12 bg-alabaster border border-border rounded overflow-hidden flex items-center justify-center ${
+                            p.image_url ? 'cursor-zoom-in hover:opacity-85 transition-opacity' : ''
+                          }`}
+                          title={p.image_url ? 'Ver foto en grande' : ''}
+                        >
                           {p.image_url ? (
                             <img
                               src={p.image_url}
